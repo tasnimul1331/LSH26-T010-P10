@@ -1,0 +1,68 @@
+{
+  "team_id": "LSH26-T010",
+  "problem_id": "P10",
+  "repository_name": "lsh26-t010-p10",
+  "live_url": "https://example.com",
+  "demo_video_url_optional": "",
+  "event_start_code": "LSH26-8490-C900",
+  "repository_created_before_release": false,
+  "pre_event_materials": [],
+  "sample_data": {
+    "loads_published_fixture": true,
+    "method": "Preloaded published fixture cases (PUB-01 to PUB-25) and custom case JSON file upload modal",
+    "reset_instructions": "Select any case (PUB-01 to PUB-25) from the top-navbar dropdown to instantly load its telemetry, or click 'Reset Authoritative Default' on the Tariff page."
+  },
+  "problem_solving_method": "Built a deterministic integer-cents financial engine using TypeScript, Next.js 15, and Tailwind CSS to eliminate floating-point drift. Implemented authoritative BERC LT-A tiered slab allocation, first-recharge monthly fixed charge deductions, daily depletion runway projection, 4-part target-date cost decomposition, and strict invariant-tested habit comparison.",
+  "requirements": {
+    "R1": {
+      "status": "complete",
+      "evidence": "app/case-data/page.tsx, lib/validation/case-schema.ts, lib/data/case-loader.ts (ingests and validates all 25 public cases PUB-01 to PUB-25 and custom JSON files with seasonal classification)"
+    },
+    "R2": {
+      "status": "complete",
+      "evidence": "app/simulation/page.tsx, lib/engine/meter-engine.ts, lib/engine/tariff-engine.ts (deterministic day-by-day balance timeline, running calendar-month unit resets, and deposit tracking)"
+    },
+    "R3": {
+      "status": "complete",
+      "evidence": "app/advisor/page.tsx, lib/engine/depletion-engine.ts, lib/engine/advisor-engine.ts (exact depletion date runway and 4-part target recharge math: base energy, slab tier effect, fixed charges, VAT)"
+    },
+    "R4": {
+      "status": "complete",
+      "evidence": "app/comparison/page.tsx, lib/engine/comparison-engine.ts, tests/comparison.test.ts (3-month strategy comparison proving identical energy consumption and zero rate arbitrage with strict invariant tests)"
+    }
+  },
+  "team_members": [
+    {
+      "registered_name": "Tasnimul Hasan",
+      "github_username": "hasan",
+      "major_contribution": "Full-stack development: BERC LT-A calculation engine, integer-cents math, interactive 3D digital meter twin, audit ledger, and PDF report export",
+      "evidence_paths_or_commits": [
+        "lib/engine/meter-engine.ts",
+        "lib/engine/tariff-engine.ts",
+        "lib/engine/advisor-engine.ts",
+        "lib/engine/comparison-engine.ts",
+        "components/three/SmartMeterCanvas.tsx",
+        "components/billing/BillPrintModal.tsx"
+      ]
+    }
+  ],
+  "major_design_decisions": [
+    "Used integer-cents Money utility (lib/utils/money.ts) across all arithmetic to guarantee zero floating-point rounding errors and 100% deterministic reproducibility",
+    "Implemented calendar-month slab counter resets on the 1st of every month per official Bangladesh BERC LT-A prepaid rules",
+    "Deducted monthly fixed charges (Demand Charge + Single-Phase Meter Rent) on the first recharge deposit event of each calendar month",
+    "Constructed 4-part additive cost decomposition for future target-date recharge calculations (Base Energy + Higher Slab Tier + Fixed Charges + VAT)",
+    "Ensured strict equal-cost verification (Delta BDT 0.00) for habit comparison under identical monthly consumption"
+  ],
+  "known_limitations": [
+    "Custom uploaded cases must adhere to the standard JSON schema with consecutive daily readings starting from the 1st of a month"
+  ],
+  "ai_tools_used": [
+    {
+      "tool": "Antigravity AI (Gemini 2.5)",
+      "used_for": "Pair-programming, BERC LT-A multi-tier slab calculation logic, comprehensive 112-test suite development, and responsive UI design",
+      "how_output_was_verified": "Verified with 112 Vitest automated tests covering all 25 public cases (101 regression tests), TypeScript compiler checks, and build validation"
+    }
+  ],
+  "licenses_file": "LICENSES.md",
+  "declaration": "The information above is complete and truthful to the best of the team's knowledge."
+}

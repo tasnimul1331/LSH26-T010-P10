@@ -1,0 +1,59 @@
+{
+  "tariff_version": "v1.0-berc-lta-residential",
+  "effective_date": "2024-03-01",
+  "name": "BERC LT-A Domestic Prepaid Tariff (Official)",
+  "description": "Authoritative Bangladesh Energy Regulatory Commission (BERC) LT-A Residential Prepaid Electricity Tariff Specification",
+  "currency": "BDT",
+  "slabs": [
+    {
+      "slab_id": "slab_1",
+      "name": "Slab 1 (0–75 kWh)",
+      "min_units": 0,
+      "max_units": 75,
+      "rate_per_unit_bdt": 5.26
+    },
+    {
+      "slab_id": "slab_2",
+      "name": "Slab 2 (76–200 kWh)",
+      "min_units": 76,
+      "max_units": 200,
+      "rate_per_unit_bdt": 7.20
+    },
+    {
+      "slab_id": "slab_3",
+      "name": "Slab 3 (201–300 kWh)",
+      "min_units": 201,
+      "max_units": 300,
+      "rate_per_unit_bdt": 7.59
+    },
+    {
+      "slab_id": "slab_4",
+      "name": "Slab 4 (301–400 kWh)",
+      "min_units": 301,
+      "max_units": 400,
+      "rate_per_unit_bdt": 8.02
+    },
+    {
+      "slab_id": "slab_5",
+      "name": "Slab 5 (401–600 kWh)",
+      "min_units": 401,
+      "max_units": 600,
+      "rate_per_unit_bdt": 12.67
+    },
+    {
+      "slab_id": "slab_6",
+      "name": "Slab 6 (Above 600 kWh)",
+      "min_units": 601,
+      "max_units": null,
+      "rate_per_unit_bdt": 14.61
+    }
+  ],
+  "demand_charge_bdt_per_kw_month": 42.00,
+  "meter_rent_bdt_per_month": 40.00,
+  "sanctioned_load_kw_default": 1.0,
+  "vat_percentage": 5.0,
+  "fixed_charge_application": "first_recharge_of_month",
+  "base_slab_rate_for_breakdown": 5.26,
+  "rounding_precision_decimals": 2,
+  "is_configured": true
+}
