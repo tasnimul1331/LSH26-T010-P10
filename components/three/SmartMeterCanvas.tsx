@@ -160,7 +160,7 @@ export const SmartMeterCanvas: React.FC<SmartMeterCanvasProps> = (props) => {
   }
 
   return (
-    <div className="w-full h-80 relative flex items-center justify-center">
+    <div className="w-full h-80 relative flex items-center justify-center animate-in fade-in duration-700">
       <Suspense fallback={<MeterFallback {...props} />}>
         <Canvas
           dpr={[1, 1.5]}
