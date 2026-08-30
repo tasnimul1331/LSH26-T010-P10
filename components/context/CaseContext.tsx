@@ -36,53 +36,54 @@ export const CaseProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [targetDateOverride, setTargetDateOverride] = useState<string | undefined>();
   const [dailyUnitsOverride, setDailyUnitsOverride] = useState<number | undefined>();
 
-  // Fetch tariff and cases list
+  // Fetch tariff, cases list, and current case data concurrently
   useEffect(() => {
-    async function init() {
+    let isMounted = true;
+    async function loadData() {
       try {
         setIsLoading(true);
-        // Load tariff
-        const tariffRes = await fetch("/api/tariff");
-        const tariffJson = await tariffRes.json();
+        const [tariffRes, casesRes, caseRes] = await Promise.all([
+          fetch("/api/tariff"),
+          fetch("/api/cases"),
+          fetch(`/api/cases/${currentCaseId}`),
+        ]);
+
+        const [tariffJson, casesJson, caseJson] = await Promise.all([
+          tariffRes.json(),
+          casesRes.json(),
+          caseRes.json(),
+        ]);
+
+        if (!isMounted) return;
+
         if (tariffJson.success) {
           setTariff(tariffJson.tariff);
         }
-
-        // Load cases summaries
-        const casesRes = await fetch("/api/cases");
-        const casesJson = await casesRes.json();
         if (casesJson.success) {
           setAvailableCases(casesJson.cases);
         }
-      } catch (err: any) {
-        console.error("Init failed:", err);
-        setError(err.message || "Failed to initialize application");
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    init();
-  }, []);
-
-  // Fetch current case data
-  useEffect(() => {
-    async function fetchCase() {
-      if (!currentCaseId) return;
-      try {
-        const res = await fetch(`/api/cases/${currentCaseId}`);
-        const json = await res.json();
-        if (json.success) {
-          setCaseData(json.case);
-          setTargetDateOverride(json.case.target_date);
-          setDailyUnitsOverride(json.case.usual_daily_units);
-        } else {
-          setError(json.error);
+        if (caseJson.success) {
+          setCaseData(caseJson.case);
+          setTargetDateOverride(caseJson.case.target_date);
+          setDailyUnitsOverride(caseJson.case.usual_daily_units);
+        } else if (caseJson.error) {
+          setError(caseJson.error);
         }
       } catch (err: any) {
-        setError(err.message);
+        if (isMounted) {
+          console.error("Data load error:", err);
+          setError(err.message || "Failed to initialize application");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     }
-    fetchCase();
+    loadData();
+    return () => {
+      isMounted = false;
+    };
   }, [currentCaseId]);
 
   // Deterministic calculation results
