@@ -15,6 +15,7 @@ import {
   Clock,
   Zap,
   RotateCcw,
+  AlertCircle,
 } from "lucide-react";
 
 export default function AdvisorPage() {
@@ -137,6 +138,15 @@ export default function AdvisorPage() {
             </button>
           </div>
         </form>
+
+        {selectedDate && selectedDate <= caseData.today && (
+          <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+            <span>
+              Target date ({selectedDate}) is today or in the past. Please select a future date after <strong>{formatDisplayDate(caseData.today)}</strong> for forward recharge planning.
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Target Recharge Result Highlight Card */}

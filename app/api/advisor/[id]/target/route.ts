@@ -32,6 +32,26 @@ export async function POST(
       );
     }
 
+    if (target_date && target_date <= caseResult.caseData.today) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Invalid target_date '${target_date}'. Target date must be strictly after today's date (${caseResult.caseData.today}).`,
+        },
+        { status: 400 }
+      );
+    }
+
+    if (usual_daily_units !== undefined && Number(usual_daily_units) <= 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Invalid usual_daily_units. Daily consumption rate must be greater than 0 kWh/day.",
+        },
+        { status: 400 }
+      );
+    }
+
     const target = calculateTargetRecharge(
       caseResult.caseData,
       tariff,
