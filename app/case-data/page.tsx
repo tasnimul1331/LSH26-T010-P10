@@ -185,10 +185,10 @@ export default function CaseDataPage() {
       )}
 
       {/* Validation Checklist Report */}
-      <div className="luxury-card p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <h3 className="text-base font-bold text-stone-900">Zod Schema Integrity Verification</h3>
+      <div className="luxury-card p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 mb-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="text-base font-bold text-stone-900">Schema Integrity Verification</h3>
             <span
               className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                 validation.is_valid
@@ -224,21 +224,180 @@ export default function CaseDataPage() {
         </div>
       </div>
 
-      {/* Raw JSON Preview */}
-      <div className="luxury-card p-6">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-base font-bold text-stone-900 flex items-center gap-2">
-            <FileJson className="w-4 h-4 text-[#8A6A24]" />
-            <span>Raw Case JSON Definition</span>
-          </h3>
-          <span className="text-xs text-stone-400 font-mono">
-            {caseData.days.length} readings • {caseData.recharges.length} recharges
+      {/* Monthly Telemetry & Seasonal Profile Matrix Table */}
+      {monthlyStats && (
+        <div className="luxury-card p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <div>
+              <h3 className="text-base font-bold text-stone-900">Recorded Months Telemetry Matrix</h3>
+              <p className="text-xs text-stone-500 mt-0.5">
+                Seasonal profile, average daily consumption, and recharge deposit volume across all {monthlyStats.monthsCount} months
+              </p>
+            </div>
+            <span className="text-xs font-mono font-bold text-[#8A6A24] bg-[#C5A059]/10 px-2.5 py-1 rounded-full self-start sm:self-auto">
+              {monthlyStats.monthsCount} Months Ingested
+            </span>
+          </div>
+
+          <div className="overflow-x-auto border border-stone-200 rounded-xl">
+            <table className="w-full text-xs text-left min-w-[650px]">
+              <thead className="bg-stone-50 border-b border-stone-200 text-stone-600 font-semibold uppercase text-[10px] tracking-wider">
+                <tr>
+                  <th className="p-3">Month</th>
+                  <th className="p-3 text-center">Seasonal Profile</th>
+                  <th className="p-3 text-right">Total Units</th>
+                  <th className="p-3 text-right">Avg Daily Usage</th>
+                  <th className="p-3 text-right">Recharge Events</th>
+                  <th className="p-3 text-right">Total Deposited</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-stone-100 font-tabular font-mono">
+                {monthlyStats.allMonths.map((m) => {
+                  const daysInMonth = caseData.days.filter((d) => d.date.startsWith(m.month)).length || 1;
+                  const avgDaily = (m.units / daysInMonth).toFixed(1);
+                  const totalDeposited = m.recharges.reduce((acc, r) => acc + r.amount, 0);
+
+                  const isLight = m.month === monthlyStats.lightMonth.month;
+                  const isHeavy = m.month === monthlyStats.heavyMonth.month;
+
+                  return (
+                    <tr key={m.month} className="hover:bg-stone-50/60">
+                      <td className="p-3 font-semibold text-stone-900 font-sans">
+                        {formatMonthName(m.month)} ({m.month})
+                      </td>
+                      <td className="p-3 text-center font-sans">
+                        {isLight ? (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-50 text-cyan-700 border border-cyan-200">
+                            Light Month
+                          </span>
+                        ) : isHeavy ? (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                            Heavy Summer Peak
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-stone-100 text-stone-600">
+                            Normal Consumption
+                          </span>
+                        )}
+                      </td>
+                      <td className="p-3 text-right font-bold text-stone-900">
+                        {m.units} kWh
+                      </td>
+                      <td className="p-3 text-right text-stone-600">
+                        {avgDaily} kWh/day
+                      </td>
+                      <td className="p-3 text-right text-stone-600">
+                        {m.recharges.length} {m.recharges.length === 1 ? "deposit" : "deposits"}
+                      </td>
+                      <td className="p-3 text-right font-bold text-emerald-700">
+                        {totalDeposited > 0 ? formatBDT(totalDeposited) : "৳0.00"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Recharge Events Audit Log */}
+      <div className="luxury-card p-4 sm:p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-base font-bold text-stone-900">Recharge Transactions Log</h3>
+            <p className="text-xs text-stone-500 mt-0.5">
+              All {caseData.recharges.length} deposit events recorded in this case timeline
+            </p>
+          </div>
+          <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+            {caseData.recharges.length} Transactions
           </span>
         </div>
 
-        <pre className="p-4 bg-stone-900 text-stone-200 text-xs font-mono rounded-xl overflow-x-auto max-h-96">
-          {JSON.stringify(caseData, null, 2)}
-        </pre>
+        <div className="overflow-x-auto border border-stone-200 rounded-xl">
+          <table className="w-full text-xs text-left min-w-[550px]">
+            <thead className="bg-stone-50 border-b border-stone-200 text-stone-600 font-semibold uppercase text-[10px] tracking-wider">
+              <tr>
+                <th className="p-3">#</th>
+                <th className="p-3">Deposit Date</th>
+                <th className="p-3">Month Period</th>
+                <th className="p-3">Timing Classification</th>
+                <th className="p-3 text-right">Amount (BDT)</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-stone-100 font-tabular font-mono">
+              {caseData.recharges.map((r, idx) => {
+                const dayNum = parseInt(r.date.substring(8, 10), 10);
+                const isLateWeek = dayNum >= 24;
+                const isFirstWeek = dayNum <= 7;
+                const amount = parseFloat(r.amount_bdt);
+
+                return (
+                  <tr key={idx} className="hover:bg-stone-50/60">
+                    <td className="p-3 text-stone-400 font-mono">{idx + 1}</td>
+                    <td className="p-3 font-semibold text-stone-900">
+                      {formatDisplayDate(r.date)}
+                    </td>
+                    <td className="p-3 text-stone-600 font-sans">
+                      {formatMonthName(r.date.substring(0, 7))}
+                    </td>
+                    <td className="p-3 font-sans">
+                      {isLateWeek && amount >= 500 ? (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                          Late-Month Large Deposit (Day {dayNum})
+                        </span>
+                      ) : isFirstWeek ? (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700">
+                          1st-Week Deposit (Day {dayNum})
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-stone-100 text-stone-600">
+                          Mid-Month (Day {dayNum})
+                        </span>
+                      )}
+                    </td>
+                    <td className="p-3 text-right font-extrabold text-emerald-700">
+                      +{formatBDT(amount)}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Clean Collapsible Developer JSON Inspector */}
+      <div className="luxury-card p-4 sm:p-6 border-dashed border-stone-300">
+        <details className="group cursor-pointer">
+          <summary className="flex items-center justify-between text-xs font-bold text-stone-700 select-none">
+            <div className="flex items-center gap-2">
+              <FileJson className="w-4 h-4 text-[#8A6A24]" />
+              <span>Developer & Judge Raw JSON Schema (Click to expand)</span>
+            </div>
+            <span className="text-[11px] text-stone-400 group-open:hidden font-normal font-mono">
+              Show JSON ({caseData.days.length} readings)
+            </span>
+          </summary>
+          <div className="mt-4 pt-3 border-t border-stone-200 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] text-stone-500 font-mono">
+                {caseData.days.length} readings • {caseData.recharges.length} recharges
+              </span>
+              <button
+                onClick={handleCopyJSON}
+                className="flex items-center gap-1 px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 text-[11px] rounded-lg transition-all"
+              >
+                {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                <span>{copied ? "Copied!" : "Copy JSON"}</span>
+              </button>
+            </div>
+            <pre className="p-3 bg-stone-900 text-stone-200 text-[11px] font-mono rounded-xl overflow-x-auto max-h-60">
+              {JSON.stringify(caseData, null, 2)}
+            </pre>
+          </div>
+        </details>
       </div>
     </div>
   );
