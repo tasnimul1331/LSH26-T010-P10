@@ -163,6 +163,8 @@ export const SmartMeterCanvas: React.FC<SmartMeterCanvasProps> = (props) => {
     <div className="w-full h-80 relative flex items-center justify-center">
       <Suspense fallback={<MeterFallback {...props} />}>
         <Canvas
+          dpr={[1, 1.5]}
+          gl={{ powerPreference: "high-performance", antialias: true, alpha: true }}
           camera={{ position: [0, 0, 5.2], fov: 45 }}
           className="w-full h-full cursor-grab active:cursor-grabbing"
         >
